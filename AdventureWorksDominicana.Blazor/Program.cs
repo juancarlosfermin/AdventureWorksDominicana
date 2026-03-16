@@ -1,4 +1,5 @@
 using AdventureWorksDominicana.Blazor.Components;
+using Blazored.Toast;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddBlazoredToast();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

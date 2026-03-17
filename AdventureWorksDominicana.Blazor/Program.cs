@@ -1,5 +1,6 @@
 using AdventureWorksDominicana.Blazor.Components;
 using AdventureWorksDominicana.Data.Context;
+using AdventureWorksDominicana.Services;
 using Blazored.Toast;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddBlazoredToast();
+builder.Services.AddScoped<ShipMethodService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

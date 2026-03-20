@@ -3,7 +3,7 @@
 @inject DepartmentService departmentService
 @inject PersonService personService
 @inject ShiftService shiftService
-@inject IToastService toastService
+@inject ToastService toastService
 @inject EmployeeService employeeService
 @inject NavigationManager navigationManager
 
@@ -30,8 +30,7 @@
                 </div>
                 <div class="mt-2">
                     <label class="form-label text-bg-info text-white">Fecha de &Uacute;ltima Modificaci&oacute;n</label>
-                    <InputDate class="form-control" @bind-Value="Department.ModifiedDate" disabled/>
-                    <ValidationMessage For="() => Department.ModifiedDate" />
+                    <input class="form-control" type="datetime-local" @bind="Department.ModifiedDate" disabled/>
                 </div>
 
                 @*Lista de Detalle Empleados*@
@@ -151,7 +150,7 @@
                 EndDate = EmployeeDepartmentHistory.EndDate,
             }
         );
-        toastService.ShowSuccess($"{PersonList.FirstOrDefault(p => p.BusinessEntityId == EmployeeDepartmentHistory.BusinessEntityId).FirstName} {PersonList.FirstOrDefault(p => p.BusinessEntityId == EmployeeDepartmentHistory.BusinessEntityId).FirstName} se añadió correctamente");
+        toastService.ShowSuccess($"{PersonList.FirstOrDefault(p => p.BusinessEntityId == EmployeeDepartmentHistory.BusinessEntityId).FirstName} {PersonList.FirstOrDefault(p => p.BusinessEntityId == EmployeeDepartmentHistory.BusinessEntityId).LastName} se añadió correctamente");
         EmployeeDepartmentHistory = new EmployeeDepartmentHistory();
     }
 
@@ -174,6 +173,17 @@
 
     private async Task Modificar()
     {
+        var isDepartmentDuplicated = await departmentService.GetList(d => (d.Name.Equals(Department.Name) || d.GroupName.Equals(Department.GroupName)) && d.DepartmentId != Department.DepartmentId);
+        if (isDepartmentDuplicated.Any())
+        {
+            toastService.ShowWarning($"El Departamento {Department.Name} ya existe");
+            return;
+        }
+        else if (!Department.EmployeeDepartmentHistories.Any())
+        {
+            toastService.ShowWarning($"El Departamento {Department.Name} debe de poseer al menos un empleado");
+            return;
+        }
         var modificado = await departmentService.Guardar(Department);
         if (modificado)
         {

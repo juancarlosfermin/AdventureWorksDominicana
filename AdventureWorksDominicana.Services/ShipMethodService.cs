@@ -63,8 +63,9 @@ public class ShipMethodService(IDbContextFactory<Contexto> DbFactory): IService<
         return await contexto.SaveChangesAsync() > 0;
     }
 
-    public Task<List<ShipMethod>> GetList(Expression<Func<ShipMethod, bool>> criterio)
+    public async Task<List<ShipMethod>> GetList(Expression<Func<ShipMethod, bool>> criterio)
     {
-        throw new NotImplementedException();
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.ShipMethods.Where(criterio).OrderBy(t => t.Name).ToListAsync();
     }
 }

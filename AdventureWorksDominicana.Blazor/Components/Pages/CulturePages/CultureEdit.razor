@@ -1,168 +1,156 @@
 ﻿@page "/Culture/Edit/{CultureId}"
-@rendermode InteractiveServer
-@inject CultureService cultureService
-@inject ToastService toastService
 @inject NavigationManager navigationManager
+@inject ToastService toastService
+@inject CultureService cultureService
+@rendermode InteractiveServer
 
-<PageTitle>Culture Edit</PageTitle>
+<PageTitle>Editar Cultura</PageTitle>
 
-<EditForm Model="@Culture" OnValidSubmit="Guardar">
-    <DataAnnotationsValidator />
-    <div class="container">
-        <div class="card shadow-lg">
-            
-            <div class="card-header d-flex justify-content-center bg-warning">
-                <h5 class="card-title text-dark mb-0">Edici&oacute;n de Cultura</h5>
-            </div>
-        
-            <div class="card-body">
-                @if (Cargando)
-                {
-                    <div class="text-center">
-                        <div class="spinner-border text-warning" role="status">
-                            <span class="visually-hidden">Cargando...</span>
-                        </div>
-                        <p>Buscando Cultura...</p>
+<Toasts class="p-3" AutoHide="true" Delay="5000" Placement="ToastsPlacement.TopRight" />
+
+@if (culture == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <EditForm Model="culture" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+        <div class="container mt-4">
+            <div class="card shadow-lg">
+                <div class="card-header">
+                    <h4 class="mb-0">Editar cultura</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">ID de Cultura</label>
+                        <InputText class="form-control" @bind-Value="culture.CultureId" readonly />
+                        <ValidationMessage For="() => culture.CultureId" />
                     </div>
-                }
-                else
-                {
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label class="form-label text-bg-warning text-dark p-1 rounded">ID de Cultura</label>
-                            <InputText class="form-control" @bind-Value="Culture.CultureId" readonly />
-                            <ValidationMessage For="() => Culture.CultureId" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-bg-warning text-dark p-1 rounded">Nombre</label>
-                            <InputText class="form-control" @bind-Value="Culture.Name" maxlength="50" />
-                            <ValidationMessage For="() => Culture.Name" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-bg-warning text-dark p-1 rounded">&Uacute;ltima Modificaci&oacute;n</label>
-                            <InputDate class="form-control" @bind-Value="Culture.ModifiedDate" readonly />
-                            <ValidationMessage For="() => Culture.ModifiedDate" />
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre</label>
+                        <InputText class="form-control" @bind-Value="culture.Name" maxlength="50" />
+                        <ValidationMessage For="() => culture.Name" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Última Modificación</label>
+                        <InputDate class="form-control" @bind-Value="culture.ModifiedDate" readonly />
+                        <ValidationMessage For="() => culture.ModifiedDate" />
                     </div>
 
-
-                    @if (MostrarConfirmacion)
+                    @if (!string.IsNullOrWhiteSpace(mensaje))
                     {
-                        <div class="alert alert-danger mt-4 mb-0 text-center" role="alert">
-                            <strong>¡Atención!</strong> ¿Estás seguro de que deseas eliminar la cultura <strong>@Culture.Name</strong>? Esta acción no se puede deshacer.
+                        <div class="alert alert-danger">
+                            @mensaje
                         </div>
                     }
-                }
-            </div>
-            
-
-            <div class="card-footer d-flex justify-content-center gap-3">
-                @if (MostrarConfirmacion)
-                {
-                    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-1" @onclick="() => MostrarConfirmacion = false">
-                        <i class="bi bi-x-circle"></i>
-                        <span>Cancelar</span>
-                    </button>
-                    <button type="button" class="btn btn-danger d-flex align-items-center gap-1" @onclick="ConfirmarEliminacion">
-                        <i class="bi bi-trash-fill"></i>
-                        <span>Sí, eliminar definitivamente</span>
-                    </button>
-                }
-                else
-                {
-                    <a href="Culture/Index" class="btn btn-outline-secondary d-flex align-items-center gap-1">
-                        <i class="bi bi-arrow-left"></i>
-                        <span>Volver</span>
-                    </a>
-                    
-                    <button type="button" class="btn btn-outline-danger d-flex align-items-center gap-1" disabled="@Cargando" @onclick="() => MostrarConfirmacion = true">
-                        <i class="bi bi-trash"></i>
-                        <span>Eliminar</span>
-                    </button>
-
-                    <button type="submit" class="btn btn-outline-warning d-flex align-items-center gap-1" disabled="@Cargando">
-                        <i class="bi bi-pencil-square"></i>
-                        <span>Actualizar</span>
-                    </button>
-                }
+                </div>
+                <div class="card-footer text-center">
+                    <a class="btn btn-outline-secondary bi bi-arrow-left" href="/Culture/Index"> Volver</a>
+                    <button type="submit" class="btn btn-outline-success bi bi-file-earmark"> Guardar</button>
+                    <button type="button" class="btn btn-outline-danger bi bi-trash" @onclick="MostrarModalEliminar"> Eliminar</button>
+                </div>
             </div>
         </div>
-    </div>
-</EditForm>
+    </EditForm>
+
+    @if (mostrarModal)
+    {
+        <div class="alert alert-danger mt-3">
+            <p>¿Desea eliminar esta cultura?</p>
+            <button class="btn btn-secondary me-2" @onclick="CerrarModalEliminar">
+                Cancelar
+            </button>
+            <button class="btn btn-danger" @onclick="EliminarConfirmado">
+                Si, eliminar
+            </button>
+        </div>
+    }
+}
 
 @code {
     [Parameter]
     public string CultureId { get; set; } = string.Empty;
 
-    private Culture Culture { get; set; } = new Culture();
-    private bool Cargando { get; set; } = true;
-    
+    private Culture? culture;
+    private string mensaje = string.Empty;
+    private bool mostrarModal = false;
 
-    private bool MostrarConfirmacion { get; set; } = false;
-
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        Cargando = true;
-        
-        if (!string.IsNullOrWhiteSpace(CultureId))
+        culture = await cultureService.Buscar(CultureId);
+        if (culture == null)
         {
-            var culturaEncontrada = await cultureService.Buscar(CultureId);
-            
-            if (culturaEncontrada != null)
-            {
-                Culture = culturaEncontrada;
-            }
-            else
-            {
-                toastService.ShowError("La Cultura que intentas editar no existe.");
-                navigationManager.NavigateTo("Culture/Index");
-            }
+            mensaje = "Cultura no encontrada";
         }
-        
-        Cargando = false;
     }
 
     private async Task Guardar()
     {
+        if (culture == null) return;
+
         var isCultureDuplicated = await cultureService.GetList(c =>
-            c.Name.ToLower() == Culture.Name.ToLower() &&
-            c.CultureId.ToLower() != Culture.CultureId.ToLower()
+            c.Name.ToLower() == culture.Name.ToLower() &&
+            c.CultureId.ToLower() != culture.CultureId.ToLower()
         );
 
         if (isCultureDuplicated.Any())
         {
-            toastService.ShowWarning($"Ya existe otra cultura registrada con el Nombre ({Culture.Name}).");
+            mensaje = $"Ya existe otra cultura registrada con el Nombre ({culture.Name}).";
             return;
         }
 
-        Culture.ModifiedDate = DateTime.Now;
+        culture.ModifiedDate = DateTime.Now;
 
-        var actualizado = await cultureService.Guardar(Culture);
-        if (actualizado)
+        try
         {
-            toastService.ShowSuccess($"Cultura {Culture.Name} actualizada correctamente.");
-            navigationManager.NavigateTo("Culture/Index");
+            if (await cultureService.Guardar(culture))
+            {
+                toastService.ShowSuccess($"Cultura {culture.Name} actualizada correctamente.");
+                navigationManager.NavigateTo("/Culture/Index");
+            }
+            else
+            {
+                mensaje = "Ocurrió un error al intentar actualizar la cultura.";
+            }
         }
-        else
+        catch (Exception ex)
         {
-            toastService.ShowError("Ocurrió un error al intentar actualizar la cultura.");
+            mensaje = ex.Message;
         }
     }
 
-    private async Task ConfirmarEliminacion()
+    private void MostrarModalEliminar()
     {
+        mostrarModal = true;
+    }
 
-        var eliminado = await cultureService.Eliminar(Culture.CultureId);
+    private void CerrarModalEliminar()
+    {
+        mostrarModal = false;
+    }
+
+    private async Task EliminarConfirmado()
+    {
+        if (culture == null) return;
+
+        try
+        {
+            if (await cultureService.Eliminar(culture.CultureId))
+            {
+                toastService.ShowSuccess("Cultura eliminada correctamente.");
+                navigationManager.NavigateTo("/Culture/Index");
+            }
+            else
+            {
+                mensaje = "Ocurrió un error al intentar eliminar la cultura.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = ex.Message;
+        }
         
-        if (eliminado)
-        {
-            toastService.ShowSuccess("Cultura eliminada correctamente.");
-            navigationManager.NavigateTo("Culture/Index");
-        }
-        else
-        {
-            toastService.ShowError("Ocurrió un error al intentar eliminar la cultura.");
-            MostrarConfirmacion = false; 
-        }
+        mostrarModal = false;
     }
 }

@@ -46,6 +46,7 @@ builder.Services.AddScoped<ProductSubcategoryService>();
 builder.Services.AddScoped<StateProvinceService>();
 builder.Services.AddScoped<CultureService>();
 builder.Services.AddScoped<StoreService>();
+builder.Services.AddScoped<LocationService>();
 
 builder.Services.AddBlazorBootstrap();
 var app = builder.Build();

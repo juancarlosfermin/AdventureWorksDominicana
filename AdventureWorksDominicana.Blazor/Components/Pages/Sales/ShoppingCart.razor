@@ -139,6 +139,7 @@
     private List<ShipMethod> ShipMethodsList = new List<ShipMethod>();
 
     private decimal taxes = 0.0m, freight = 0.0m, discountPct = 0.0m, subtotal = 0.0m, total = 0.0m;
+    private const decimal GrToLb = 453.59237m, KgToLb = 2.20462262m;
     private int territoryId, addressId, customerId, creditCardId, shipMethodId;
     private bool showModal = false;
 
@@ -175,13 +176,13 @@
         foreach(var m in ShoppingCartItemList)
         {
             if(m?.Product?.WeightUnitMeasureCode?.Trim() == "G")
-                weight += ((m?.Product?.Weight ?? 0) * (m?.Quantity ?? 0)) / 453.59237m;
+                weight += ((m?.Product?.Weight ?? 0) * (m?.Quantity ?? 0)) / GrToLb;
             else if (m?.Product?.WeightUnitMeasureCode?.Trim() == "KG")
-                weight += ((m?.Product?.Weight ?? 0) * (m?.Quantity ?? 0)) * 2.20462262m;
+                weight += ((m?.Product?.Weight ?? 0) * (m?.Quantity ?? 0)) * KgToLb;
             else
                 weight += (m?.Product?.Weight ?? 0) * (m?.Quantity ?? 0);   
         }
-        freight =shipBase + (weight * shipRate);
+        freight = shipBase + (weight * shipRate);
     }
 
     private void GetTotal() => total = (freight + subtotal + (subtotal * taxes)) - discountPct;
@@ -245,11 +246,15 @@
 
     private async Task DeleteItemCart(int itemId)
     {
-        var eliminated = await shoppingCartItemService.Eliminar(itemId);
-        if (eliminated)
+        try
         {
+            var eliminated = await shoppingCartItemService.Eliminar(itemId);
             toastService.ShowSuccess("Producto eliminado correctamente");
             await RefreshShoppingCart();
+        }catch(Exception ex)
+        {
+            toastService.ShowSuccess("Producto no pudo ser eliminado correctamente");
+            Console.Write(ex.Message);
         }
     }
 
@@ -259,12 +264,12 @@
             {
                 RevisionNumber = 0,
                 OrderDate = DateTime.Now,
-                DueDate = DateTime.Now.AddDays(10),
-                ShipDate = null,
+                DueDate = DateTime.Now.AddDays(30),
+                ShipDate = DateTime.Now.AddDays(2),
                 Status = 1,
                 OnlineOrderFlag = true,
-                SalesOrderNumber = $"SO{Random.Shared.Next()}",
-                PurchaseOrderNumber = $"PO{Random.Shared.Next()}",
+                SalesOrderNumber = $"SO{Random.Shared.Next(10000, 99999)}",
+                PurchaseOrderNumber = null,
                 AccountNumber = null,
                 CustomerId = customerId,
                 SalesPersonId = null,
@@ -280,7 +285,6 @@
                 Freight = freight,
                 TotalDue = total,
                 Comment = null,
-                Rowguid = Guid.NewGuid(),
                 ModifiedDate = DateTime.Now
             };
         foreach(var s in ShoppingCartItemList)
@@ -290,16 +294,18 @@
                 .Where(o => o.StartDate <= DateTime.Now && o.EndDate >= DateTime.Now)
                 .OrderByDescending(o => o.DiscountPct)
                 .FirstOrDefault();
+            var unitPrice = (s?.Product?.ListPrice ?? 0);
+            var unitPriceDiscount = unitPrice * (offer?.DiscountPct ?? 0);
             newOrder.SalesOrderDetails.Add(
                 new SalesOrderDetail
                 {
                     CarrierTrackingNumber = null,
-                    OrderQty = Convert.ToInt16(s.Quantity),
+                    OrderQty = Convert.ToInt16(s?.Quantity ?? 0),
                     ProductId = s.ProductId,
                     SpecialOfferId = offer?.SpecialOfferId ?? 0,
-                    UnitPrice = s?.Product?.ListPrice ?? 0,
-                    UnitPriceDiscount = ((s?.Quantity ?? 0) * (s?.Product?.ListPrice ?? 0)) - (((s?.Quantity ?? 0) * (s?.Product?.ListPrice ?? 0)) * offer?.DiscountPct ?? 0),
-                    LineTotal = total,
+                    UnitPrice = unitPrice,
+                    UnitPriceDiscount = unitPriceDiscount,
+                    LineTotal = (s?.Quantity ?? 0) * (unitPrice - unitPriceDiscount),
                     Rowguid = Guid.NewGuid(),
                     ModifiedDate = DateTime.Now
                 }

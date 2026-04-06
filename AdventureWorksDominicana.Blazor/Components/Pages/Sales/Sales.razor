@@ -75,8 +75,6 @@
 @code {
     private List<Product> ProductList = new List<Product>();
     private int shoppingCount = 0;
-    private PaginationState pages = new PaginationState { ItemsPerPage = 5 };
-    private DateTime? StartDate = DateTime.Today, EndDate = DateTime.Today;
     private string Filtro = string.Empty, ValorFiltro = string.Empty;
     private List<Product> PagedProducts = new List<Product>(); 
 
@@ -99,23 +97,24 @@
 
     private async Task Guardar(int productId)
     {
-        var creado = await shoppingCartItemService.Guardar(
-            new ShoppingCartItem
-            {
-                ShoppingCartId = $"CARID-{Random.Shared.Next(10000, 99999)}",
-                Quantity = 1,
-                ProductId = productId,
-                DateCreated = DateTime.Now,
-                ModifiedDate = DateTime.Now
-            }
-        );
         try
         {
+             await shoppingCartItemService.Guardar(
+                new ShoppingCartItem
+                {
+                    ShoppingCartId = $"CARID-{Random.Shared.Next(10000, 99999)}",
+                    Quantity = 1,
+                    ProductId = productId,
+                    DateCreated = DateTime.Now,
+                    ModifiedDate = DateTime.Now
+                }
+            );
             toastService.ShowSuccess("Producto añadido al carrito");
             await CountProductsShopping();
         }catch(Exception ex)
         {
             toastService.ShowSuccess("Producto no pudo ser añadido al carrito");
+            Console.WriteLine(ex.Message);
         }
     }
 
@@ -149,12 +148,11 @@
     {
         var value = e?.Value?.ToString();
         Expression<Func<Product, bool>> criterio = e => true;
-        if (value.Trim() != "")
+        if (value?.Trim() != "")
         {
             criterio = criterio.And(e => e.Name.ToLower().Contains(value.ToLower()) || e.ProductSubcategory.ProductCategory.Name.ToLower().Contains(value.ToLower()));
         }
         ProductList = await productService.GetList(criterio);
         ActualizarVista();
-
     }
 }

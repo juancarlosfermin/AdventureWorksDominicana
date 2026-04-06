@@ -30,14 +30,39 @@ public class CustomerService(IDbContextFactory<Contexto> DbFactory) : IService<C
     private async Task<bool> Insertar(Customer entidad)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-
-        if (entidad.Person != null)
+        if (entidad.PersonId is not null && entidad.PersonId != 0)
+        {
+            var person = await contexto.People.FindAsync(entidad.PersonId);
+            if (person != null) entidad.Person = person;
+        }
+        else if (entidad.Person != null)
         {
             contexto.Entry(entidad.Person).State = EntityState.Unchanged;
         }
-        if (entidad.Store != null)
+
+        if (entidad.StoreId is not null && entidad.StoreId != 0)
+        {
+            var store = await contexto.Stores.FindAsync(entidad.StoreId);
+            if (store != null) entidad.Store = store;
+        }
+        else if (entidad.Store != null)
         {
             contexto.Entry(entidad.Store).State = EntityState.Unchanged;
+        }
+
+        if (entidad.TerritoryId is not null && entidad.TerritoryId != 0)
+        {
+            var territory = await contexto.SalesTerritories.FindAsync(entidad.TerritoryId);
+            if (territory != null) entidad.Territory = territory;
+        }
+        else if (entidad.Territory != null)
+        {
+            contexto.Entry(entidad.Territory).State = EntityState.Unchanged;
+        }
+
+        if (entidad.Rowguid == Guid.Empty)
+        {
+            entidad.Rowguid = Guid.NewGuid();
         }
 
         contexto.Customers.Add(entidad);
@@ -48,15 +73,34 @@ public class CustomerService(IDbContextFactory<Contexto> DbFactory) : IService<C
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
 
-        if (entidad.Person != null)
+        if (entidad.PersonId is not null && entidad.PersonId != 0)
         {
-            contexto.Attach(entidad.Person);
+            var person = await contexto.People.FindAsync(entidad.PersonId);
+            if (person != null) entidad.Person = person;
+        }
+        else if (entidad.Person != null)
+        {
             contexto.Entry(entidad.Person).State = EntityState.Unchanged;
         }
-        if (entidad.Store != null)
+
+        if (entidad.StoreId is not null && entidad.StoreId != 0)
         {
-            contexto.Attach(entidad.Store);
+            var store = await contexto.Stores.FindAsync(entidad.StoreId);
+            if (store != null) entidad.Store = store;
+        }
+        else if (entidad.Store != null)
+        {
             contexto.Entry(entidad.Store).State = EntityState.Unchanged;
+        }
+
+        if (entidad.TerritoryId is not null && entidad.TerritoryId != 0)
+        {
+            var territory = await contexto.SalesTerritories.FindAsync(entidad.TerritoryId);
+            if (territory != null) entidad.Territory = territory;
+        }
+        else if (entidad.Territory != null)
+        {
+            contexto.Entry(entidad.Territory).State = EntityState.Unchanged;
         }
 
         contexto.Customers.Update(entidad);
@@ -91,6 +135,6 @@ public class CustomerService(IDbContextFactory<Contexto> DbFactory) : IService<C
     public async Task<List<Customer>> GetList(Expression<Func<Customer, bool>> criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        return await contexto.Customers.Where(criterio).OrderBy(c => c.CustomerId).ToListAsync();
+        return await contexto.Customers.Where(criterio).Include(c => c.Person).Include(c => c.Store).Include(c => c.Territory).OrderBy(c => c.CustomerId).ToListAsync();
     }
 }

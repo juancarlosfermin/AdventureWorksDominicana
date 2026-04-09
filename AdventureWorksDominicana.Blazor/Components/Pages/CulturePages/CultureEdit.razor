@@ -1,0 +1,140 @@
+﻿@page "/Culture/Edit/{CultureId}"
+
+@inject NavigationManager navigationManager
+@inject ToastService toastService
+@inject CultureService cultureService
+@rendermode InteractiveServer
+
+<PageTitle>Editar Cultura</PageTitle>
+
+@if (culture == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <EditForm Model="culture" FormName="editarCulture" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+
+        <div class="container">
+            <div class="card shadow-lg">
+                <div class="card-header text-center">
+                    <h4>Editar Cultura</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="pb-3">Datos de la Cultura</h5>
+                    
+
+                    <div class="mb-3">
+                        <label><strong>ID de Cultura</strong></label>
+                        <input class="form-control" value="@culture.CultureId" disabled />
+                        <ValidationMessage For="(() => culture.CultureId)" />
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label><strong>Nombre</strong></label>
+                        <input class="form-control" type="text" maxlength="50" @bind="culture.Name" placeholder="Escriba el nombre de la cultura..." />
+                        <ValidationMessage For="(() => culture.Name)" />
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label><strong>Última Modificación</strong></label>
+                        <input class="form-control" type="text" value="@culture.ModifiedDate.ToString("dd/MM/yyyy")" disabled />
+                        <ValidationMessage For="(() => culture.ModifiedDate)" />
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(mensaje))
+                    {
+                        <div class="alert alert-danger mt-3">
+                            @mensaje
+                        </div>
+                    }
+                </div>
+                <div class="card-footer text-center">
+                    <a class="btn btn-secondary bi bi-arrow-left" href="/Culture/Index"> Volver</a>
+                    <button class="btn btn-primary bi bi-floppy" type="submit"> Modificar</button>
+                    <button class="btn btn-danger bi bi-trash" type="button" @onclick="Eliminar"> Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public string CultureId { get; set; } = string.Empty;
+
+    public Culture? culture { get; set; }
+    private string mensaje = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        culture = await cultureService.Buscar(CultureId);
+        if (culture == null)
+        {
+            toastService.ShowError("Cultura no encontrada.");
+            navigationManager.NavigateTo("/Culture/Index");
+        }
+    }
+
+    public async Task Guardar()
+    {
+        if (culture == null) return;
+
+        var isCultureDuplicated = await cultureService.GetList(c =>
+            c.Name.ToLower() == culture.Name.ToLower() &&
+            c.CultureId.ToLower() != culture.CultureId.ToLower()
+        );
+
+        if (isCultureDuplicated.Any())
+        {
+            mensaje = $"Ya existe otra cultura registrada con el Nombre ({culture.Name}).";
+            return;
+        }
+
+        culture.ModifiedDate = DateTime.Now;
+
+        try
+        {
+            bool guardado = await cultureService.Guardar(culture);
+            if (guardado)
+            {
+                toastService.ShowSuccess($"Cultura '{culture.Name}' actualizada correctamente.");
+                navigationManager.NavigateTo("/Culture/Index");
+            }
+            else
+            {
+                toastService.ShowError("Ocurrió un error inesperado al intentar actualizar la cultura.");
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = ex.Message;
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        if (culture == null) return;
+
+        try
+        {
+            bool eliminado = await cultureService.Eliminar(culture.CultureId);
+            if (eliminado)
+            {
+                toastService.ShowSuccess("La cultura se ha eliminado correctamente.");
+                navigationManager.NavigateTo("/Culture/Index");
+            }
+            else
+            {
+                toastService.ShowError("Ha ocurrido un error inesperado al eliminar la cultura.");
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = ex.Message;
+        }
+    }
+}

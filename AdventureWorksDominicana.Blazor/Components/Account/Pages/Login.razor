@@ -1,0 +1,153 @@
+﻿@page "/"
+@page "/Account/Login"
+@attribute [AllowAnonymous]
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using AdventureWorksDominicana.Data.Context
+
+@inject UserManager<AspNetUser> UserManager
+@inject SignInManager<AspNetUser> SignInManager
+@inject ILogger<Login> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>Inicia Sesión | AdventureWorks</PageTitle>
+
+<div class="aw-auth-wrapper">
+    <div class="aw-auth-card">
+        
+        <div class="aw-auth-login-col">
+            <StatusMessage Message="@errorMessage" />
+            
+            <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
+                <DataAnnotationsValidator />
+                
+                <div class="aw-brand-header">
+                    <h2 class="aw-auth-title">Adventure<span>Works</span></h2>
+                    <p class="aw-auth-subtitle">Bienvenido de vuelta. Inicia sesión para continuar.</p>
+                </div>
+
+                <div class="aw-input-group">
+                    <label for="Input.Email">Correo Electrónico</label>
+                    <div class="aw-input-wrapper with-icon">
+                        <i class="bi bi-envelope aw-input-icon"></i>
+                        <InputText @bind-Value="Input.Email" id="Input.Email" class="aw-input-control" autocomplete="username" aria-required="true" placeholder="nombre@ejemplo.com" />
+                    </div>
+                    <ValidationMessage For="() => Input.Email" class="aw-text-danger" />
+                </div>
+
+                <div class="aw-input-group aw-password-field">
+                    <label for="Input.Password">Contraseña</label>
+                    <div class="aw-input-wrapper with-icon">
+                        <i class="bi bi-lock aw-input-icon"></i>
+                        <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="aw-input-control" autocomplete="current-password" aria-required="true" placeholder="••••••••" />
+                    </div>
+                    <ValidationMessage For="() => Input.Password" class="aw-text-danger" />
+                </div>
+
+                <div class="aw-auth-options">
+                    <label class="aw-checkbox-label">
+                        <InputCheckbox @bind-Value="Input.RememberMe" class="aw-custom-checkbox" />
+                        <span>Recordarme</span>
+                    </label>
+                    <a href="Account/ForgotPassword" class="aw-forgot-link">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="aw-btn-login">
+                    Iniciar Sesión <i class="bi bi-arrow-right-short"></i>
+                </button>
+
+                <div class="aw-resend-email" style="margin-top: 30px;">
+                    <a href="Account/ResendEmailConfirmation" class="aw-forgot-link"><i class="bi bi-envelope-check"></i> Reenviar confirmación de email</a>
+                </div>
+            </EditForm>
+        </div>
+
+        <div class="aw-auth-register-col">
+            <div class="aw-register-content">
+                <div class="aw-glow-icon">
+                    <i class="bi bi-rocket-takeoff"></i>
+                </div>
+                <h2 class="aw-auth-title aw-title-white">¿Eres Nuevo Aquí?</h2>
+                <p class="aw-auth-text">Únete a nuestra comunidad hoy mismo y descubre las mejores herramientas para tu negocio.</p>
+                <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" class="aw-btn-register">Crear una Cuenta</a>
+            </div>
+            
+            <div class="aw-circle-deco deco-1"></div>
+            <div class="aw-circle-deco deco-2"></div>
+        </div>
+        
+    </div>
+</div>
+
+@code {
+    private string? errorMessage;
+    private EditContext editContext = default!;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Input ??= new();
+        editContext = new EditContext(Input);
+
+        if (HttpMethods.IsGet(HttpContext.Request.Method))
+        {
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        }
+    }
+
+    public async Task LoginUser()
+    {
+        if (!editContext.Validate())
+        {
+            return;
+        }
+
+        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
+        if (result.Succeeded)
+        {
+            Logger.LogInformation("El usuario ha iniciado sesión exitosamente.");
+            NavigationManager.NavigateTo("Home/Page");
+        }
+        else if (result.RequiresTwoFactor)
+        {
+            RedirectManager.RedirectTo(
+                "Account/LoginWith2fa",
+                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+        }
+        else if (result.IsLockedOut)
+        {
+            Logger.LogWarning("La cuenta del usuario ha sido bloqueada.");
+            RedirectManager.RedirectTo("Account/Lockout");
+        }
+        else
+        {
+            errorMessage = "Credenciales incorrectas. Inténtalo de nuevo.";
+        }
+    }
+
+    private sealed class InputModel
+    {
+        [Required(ErrorMessage = "El correo es obligatorio.")]
+        [EmailAddress(ErrorMessage = "Formato de correo inválido.")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+
+        [Display(Name = "¿Recordarme?")]
+        public bool RememberMe { get; set; }
+    }
+}

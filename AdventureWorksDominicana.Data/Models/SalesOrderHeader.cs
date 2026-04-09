@@ -38,7 +38,7 @@ public partial class SalesOrderHeader
     /// Date the order is due to the customer.
     /// </summary>
     [Column(TypeName = "datetime")]
-    public DateTime DueDate { get; set; }
+    public DateTime? DueDate { get; set; }
 
     /// <summary>
     /// Date the order was shipped to the customer.
@@ -77,6 +77,7 @@ public partial class SalesOrderHeader
     /// <summary>
     /// Customer identification number. Foreign key to Customer.BusinessEntityID.
     /// </summary>
+
     [Column("CustomerID")]
     public int CustomerId { get; set; }
 
@@ -100,7 +101,6 @@ public partial class SalesOrderHeader
 
     /// <summary>
     /// Customer shipping address. Foreign key to Address.AddressID.
-    /// </summary>
     [Column("ShipToAddressID")]
     public int ShipToAddressId { get; set; }
 

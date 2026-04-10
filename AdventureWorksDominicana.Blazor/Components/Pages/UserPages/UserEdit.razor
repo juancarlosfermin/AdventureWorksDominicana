@@ -1,5 +1,5 @@
 ﻿@page "/User/Edit/{Id}"
-@attribute [Authorize(Roles = "Admin")]
+@* @attribute [Authorize(Roles = "Admin")] *@
 @using AdventureWorksDominicana.Data.Models
 @using AdventureWorksDominicana.Services
 @inject ToastService toastService
@@ -49,7 +49,7 @@
 
     AspNetUser usuario = new AspNetUser();
     List<AspNetRole> ListaRoles = new List<AspNetRole>();
-    
+
     string IdRolSeleccionado = "";
     string IdRolOriginal = ""; 
 
@@ -68,16 +68,14 @@
 
     public async Task Guardar()
     {
-        string idAFijar = !string.IsNullOrEmpty(IdRolSeleccionado) ? IdRolSeleccionado : IdRolOriginal;
+        var rolNuevo = ListaRoles.FirstOrDefault(r => r.Id == IdRolSeleccionado);
 
-        var rolNuevo = ListaRoles.FirstOrDefault(r => r.Id == idAFijar);
-        
         if (rolNuevo != null)
         {
             usuario.Roles.Clear();
             usuario.Roles.Add(rolNuevo);
-
             var guardado = await userService.Guardar(usuario);
+        
             if (guardado)
             {
                 toastService.ShowSuccess("Usuario actualizado con éxito.");
@@ -85,12 +83,8 @@
             }
             else
             {
-                toastService.ShowError("Error al guardar los cambios.");
+                toastService.ShowError("Error al guardar.");
             }
-        }
-        else
-        {
-            toastService.ShowWarning("El usuario debe tener un rol asignado obligatoriamente.");
         }
     }
 

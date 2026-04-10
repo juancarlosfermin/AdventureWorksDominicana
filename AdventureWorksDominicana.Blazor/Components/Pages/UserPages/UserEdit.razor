@@ -1,0 +1,105 @@
+﻿@page "/User/Edit/{Id}"
+@attribute [Authorize(Roles = "Admin")]
+@using AdventureWorksDominicana.Data.Models
+@using AdventureWorksDominicana.Services
+@inject ToastService toastService
+@inject NavigationManager navigationManager
+@inject UserService userService
+@rendermode InteractiveServer
+
+<PageTitle>Editar User</PageTitle>
+
+<EditForm Model="@usuario" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header d-flex justify-content-between">
+                <h4>Editar User</h4>
+            </div>
+            <div class="card-body bg-light">
+                <div class="justify-content-between">
+                    <div class="row g-4 mb-6 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Email: </strong></label>
+                            <label class="form-label"> @usuario.Email</label>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Rol: </strong></label>
+                            <InputSelect class="form-select" @bind-Value="IdRolSeleccionado">
+                                @foreach (var rol in ListaRoles)
+                                {
+                                    <option value="@rol.Id">@rol.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <a class="btn btn-secondary bi bi-arrow-left" href="/User/Index"> Volver</a>
+                <button class="btn btn-primary bi bi-floppy" type="submit"> Guardar</button>
+                <button class="btn btn-danger bi bi-trash" type="button" @onclick="Eliminar"> Eliminar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public string Id { get; set; }
+
+    AspNetUser usuario = new AspNetUser();
+    List<AspNetRole> ListaRoles = new List<AspNetRole>();
+    
+    string IdRolSeleccionado = "";
+    string IdRolOriginal = ""; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await userService.Buscar(Id);
+        if (user != null)
+        {
+            usuario = user;
+            IdRolSeleccionado = usuario.Roles.Select(r => r.Id).FirstOrDefault() ?? "";
+            IdRolOriginal = IdRolSeleccionado;
+        }
+
+        ListaRoles = await userService.GetListRoles(x => true);
+    }
+
+    public async Task Guardar()
+    {
+        string idAFijar = !string.IsNullOrEmpty(IdRolSeleccionado) ? IdRolSeleccionado : IdRolOriginal;
+
+        var rolNuevo = ListaRoles.FirstOrDefault(r => r.Id == idAFijar);
+        
+        if (rolNuevo != null)
+        {
+            usuario.Roles.Clear();
+            usuario.Roles.Add(rolNuevo);
+
+            var guardado = await userService.Guardar(usuario);
+            if (guardado)
+            {
+                toastService.ShowSuccess("Usuario actualizado con éxito.");
+                navigationManager.NavigateTo("/User/Index");
+            }
+            else
+            {
+                toastService.ShowError("Error al guardar los cambios.");
+            }
+        }
+        else
+        {
+            toastService.ShowWarning("El usuario debe tener un rol asignado obligatoriamente.");
+        }
+    }
+
+    private async Task Eliminar()
+    {
+        if (await userService.Eliminar(usuario.Id))
+        {
+            toastService.ShowSuccess("Usuario eliminado.");
+            navigationManager.NavigateTo("/User/Index");
+        }
+    }
+}

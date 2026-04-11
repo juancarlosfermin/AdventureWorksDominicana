@@ -257,7 +257,7 @@
             var results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(phone, context, results, true))
             {
-                toastService.ShowError( $"Error en el formato del teléfono. [{phone.PhoneNumber}]");
+                toastService.ShowError($"Error en el formato del teléfono [{phone.PhoneNumber}]. Formato correcto: (809-555-5555)");
                 return;
             }
         }
@@ -270,7 +270,7 @@
             var results = new List<ValidationResult>();
             if (!Validator.TryValidateObject(email, context, results, true))
             {
-                toastService.ShowError( $"Error en el formato del correo. [{email.EmailAddress1}]");
+                toastService.ShowError($"Error en el formato del correo. [{email.EmailAddress1}]. Formato correcto: (ejemplo@dominio.com)");
                 return;
             }
         }

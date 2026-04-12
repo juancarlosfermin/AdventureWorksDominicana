@@ -4,8 +4,9 @@
 @inject PayrollParameterService parameterService
 @inject ToastService toastService
 @rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin,HRManager")]
 
-<PageTitle>Parámetros de N&oacute;mina</PageTitle>
+<PageTitle>Par&aacute;metros de N&oacute;mina</PageTitle>
 
 <div class="container mt-4">
     <div class="card shadow-lg border-0">

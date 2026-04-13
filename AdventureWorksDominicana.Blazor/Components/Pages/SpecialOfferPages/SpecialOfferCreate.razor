@@ -1,4 +1,4 @@
-﻿@page "/SpecialOffer/Create"
+@page "/SpecialOffer/Create"
 @attribute [Authorize(Roles = "Admin, ProductionManager")]
 
 @using AdventureWorksDominicana.Data.Models
@@ -166,6 +166,10 @@
         Rowguid = Guid.NewGuid()
     };
 
+    // Variable intermedia: el usuario ingresa en % natural (ej: 15 para 15%)
+    // Se convierte a decimal (0.15) antes de guardar en BD
+    private decimal DiscountPorcentaje { get; set; } = 0;
+
     public async Task Guardar()
     {
         if (string.IsNullOrWhiteSpace(Offer.Description))
@@ -191,6 +195,9 @@
             toastService.ShowWarning("Debe seleccionar un Tipo y una Categoría.");
             return;
         }
+
+        // Convertir % natural (ej: 15) a decimal de BD (ej: 0.15)
+        Offer.DiscountPct = DiscountPorcentaje / 100;
 
         if (await specialOfferService.Guardar(Offer))
         {

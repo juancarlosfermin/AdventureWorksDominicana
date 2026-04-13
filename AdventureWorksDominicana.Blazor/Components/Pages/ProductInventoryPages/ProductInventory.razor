@@ -5,6 +5,7 @@
 @using AdventureWorksDominicana.Services
 @using AdventureWorksDominicana.Data.Models
 @using InventoryModel = AdventureWorksDominicana.Data.Models.ProductInventory
+@inject AuthenticationStateProvider authenticationStateProvider
 
 @inject ProductInventoryService InventoryService
 
@@ -79,27 +80,27 @@
                 }
             </TemplateColumn>
 
-            <!-- AJUSTE -->
-            
-            <TemplateColumn Title="Ajuste" Class="text-center" Context="producto">
-                <div class="adjust-buttons">
-
-                    <button class="btn-adjust minus"
-                            @onclick="() => Ajustar(producto, -1)"
-                            disabled="@(producto.Quantity <= 0)">
-                        <i class="bi bi-dash"></i>
-                    </button>
-
-                    <button class="btn-adjust plus"
-                            @onclick="() => Ajustar(producto, 1)">
-                        <i class="bi bi-plus"></i>
-                    </button>
-
-                </div>
-            </TemplateColumn>
-               
-
-        </QuickGrid>
+                    @if (canEdit)
+                    {
+                        <TemplateColumn Title="Ajuste Rápido" Align="Align.Center">
+                            <div class="btn-group shadow-sm rounded-pill bg-light border p-1">
+                                <button class="btn btn-sm btn-white border-0 rounded-circle me-1"
+                                        @onclick="() => Ajustar(context, -1)"
+                                        disabled="@(context.Quantity <= 0)"
+                                        title="Restar 1">
+                                    <i class="bi bi-dash-lg text-danger"></i>
+                                </button>
+                                <button class="btn btn-sm btn-white border-0 rounded-circle"
+                                        @onclick="() => Ajustar(context, 1)"
+                                        title="Sumar 1">
+                                    <i class="bi bi-plus-lg text-success"></i>
+                                </button>
+                            </div>
+                        </TemplateColumn>
+                    }
+                   
+                </QuickGrid>
+            </div>
 
         <Paginator State="@pagination" />
 
@@ -110,8 +111,17 @@
     private List<InventoryModel>? inventario;
     private string Filtro = string.Empty;
     private PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    private bool canEdit = false;
 
-    protected override async Task OnInitializedAsync() => await CargarDatos();
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        canEdit = user.IsInRole("Admin") || user.IsInRole("ProductionManager");
+        await CargarDatos();
+    }
+    
 
     private async Task CargarDatos() => inventario = await InventoryService.GetList(i => true);
 

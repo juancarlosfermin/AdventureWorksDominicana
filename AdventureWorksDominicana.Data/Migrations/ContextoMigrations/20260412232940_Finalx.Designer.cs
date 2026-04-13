@@ -4,6 +4,7 @@ using AdventureWorksDominicana.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdventureWorksDominicana.Data.Migrations.ContextoMigrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20260412232940_Finalx")]
+    partial class Finalx
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1107,10 +1110,6 @@ namespace AdventureWorksDominicana.Data.Migrations.ContextoMigrations
                         .HasColumnName("BusinessEntityID")
                         .HasComment("Primary key for Employee records.  Foreign key to BusinessEntity.BusinessEntityID.");
 
-                    b.Property<string>("BankAccountNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date")
                         .HasComment("Date of birth.");
@@ -1522,6 +1521,7 @@ namespace AdventureWorksDominicana.Data.Migrations.ContextoMigrations
                         .HasColumnType("date");
 
                     b.Property<int>("Status")
+                        .HasMaxLength(20)
                         .HasColumnType("int");
 
                     b.HasKey("PayrollId");

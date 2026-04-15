@@ -76,10 +76,12 @@
 							<p>@(p?.ProductModel?.ProductModelProductDescriptionCultures?
 								.FirstOrDefault()?.ProductDescription?.Description ?? "Sin descripción")</p>
 						</div>
-						<div class="sale-product-price">
+						
+                        <div class="sale-product-price d-flex justify-content-between align-items-center">
 							<span>RD$ @(p?.ListPrice.ToString("N2") ?? "N/A")</span>
+							<small class="text-primary fw-bold">Stock: @(p?.ProductInventories?.Sum(i => i.Quantity) ?? 0)</small>
 						</div>
-						<button type="button" @onclick:stopPropagation @onclick="() => Guardar(p.ProductId)">
+                        <button type="button" @onclick:stopPropagation @onclick="() => Guardar(p.ProductId)">
 							<i class="bi bi-cart"></i>
 							<span>Añadir al Carrito</span>
 						</button>

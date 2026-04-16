@@ -517,8 +517,7 @@
 			return discount * totalProduct;
 		});
 	}
-
-private void GetTaxes()
+	private void GetTaxes()
     {
         decimal taxRate = 0;
 
@@ -942,6 +941,5 @@ private void GetTaxes()
 			if (NewCard != null) NewCard.CardNumber = numeroTarjetaFormateado;
 		}
 	}
-
 	private void GoToCart() => navigationManager.NavigateTo("/ShoppingCart");
 }

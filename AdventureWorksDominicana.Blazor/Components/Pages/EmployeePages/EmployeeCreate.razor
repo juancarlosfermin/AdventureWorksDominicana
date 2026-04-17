@@ -154,7 +154,7 @@
 </EditForm>
 
 @code {
-    
+
     public Employee Employee { get; set; } = new Employee();
     private int? SelectedPersonId;
     private string mensajeError = string.Empty;
@@ -162,6 +162,10 @@
     private EditContext? editContext;
     private ValidationMessageStore? messageStore;
     private short SelectedDepartmentId = 0;
+    private bool errorPersona = false;
+    private bool errorDepartamento = false;
+    private bool errorTanda = false;
+    private bool errorCuenta = false;
     private byte SelectedShiftId = 0;
     private decimal InitialRateDOP = 0;
     private byte InitialPayFrequency = 1;
@@ -188,7 +192,12 @@
 
     public async Task Guardar()
     {
+        messageStore?.Clear();
         mensajeError = string.Empty;
+        errorPersona = false;
+        errorDepartamento = false;
+        errorTanda = false;
+        errorCuenta = false;
 
         // Verifico que realmente buscaron y seleccionaron a alguien
         if (!SelectedPersonId.HasValue)

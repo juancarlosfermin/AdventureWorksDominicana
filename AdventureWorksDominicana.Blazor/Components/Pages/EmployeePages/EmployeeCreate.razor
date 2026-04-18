@@ -200,6 +200,12 @@
         errorTanda = false;
         errorCuenta = false;
 
+        
+        if (editContext == null || !editContext.Validate())
+        {
+            return;
+        }
+
         // Verifico que realmente buscaron y seleccionaron a alguien
         if (!SelectedPersonId.HasValue)
         {

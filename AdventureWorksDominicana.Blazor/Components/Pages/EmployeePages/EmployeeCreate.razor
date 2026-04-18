@@ -35,7 +35,9 @@
                 <div class="row mt-3">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Persona</label>
-                        <PersonSearch @bind-PersonaId="SelectedPersonId" />
+                        <div class="@(errorPersona ? "border border-danger rounded" : "")">
+                            <PersonSearch @bind-PersonaId="SelectedPersonId" />
+                        </div>
                         <ValidationMessage For="(() => Employee.BusinessEntityId)" class="text-danger" />
                     </div>
                     <div class="col-md-6 mb-3">
@@ -103,7 +105,7 @@
                 <div class="row mt-3">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Departamento</label>
-                        <select class="form-select" @bind="SelectedDepartmentId" required>
+                        <select class="form-select @(errorDepartamento ? "is-invalid" : "")" @bind="SelectedDepartmentId" required>
                             <option value="0" selected hidden disabled>Seleccione un departamento...</option>
                             @foreach (var depto in Departamentos)
                             {
@@ -113,7 +115,7 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Tanda (Turno)</label>
-                        <select class="form-select" @bind="SelectedShiftId" required>
+                        <select class="form-select @(errorTanda ? "is-invalid" : "")" @bind="SelectedShiftId" required>
                             <option value="0" selected hidden disabled>Seleccione un turno...</option>
                             @foreach (var turno in Turnos)
                             {
@@ -131,14 +133,13 @@
                             <option value="1">Mensual</option>
                             <option value="2">Quincenal</option>
                         </select>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">N&uacute;mero de Cuenta (Banreservas)</label>
+                            <InputText class="form-control @(errorCuenta ? "is-invalid" : "")" maxlength="20" @bind-Value="Employee.BankAccountNumber" placeholder="Ej: 9601234567" />
+                            <small class="text-muted">M&iacute;nimo 10 d&iacute;gitos para cuentas de ahorro.</small>
+                            <ValidationMessage For="(() => Employee.BankAccountNumber)" class="text-danger" />
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">N&uacute;mero de Cuenta (Banreservas)</label>
-                        <InputText class="form-control" maxlength="20" @bind-Value="Employee.BankAccountNumber" placeholder="Ej: 9601234567" />
-                        <small class="text-muted">M&iacute;nimo 10 d&iacute;gitos para cuentas de ahorro.</small>
-                        <ValidationMessage For="(() => Employee.BankAccountNumber)" class="text-danger" />
-                    </div>
-                </div>
 
             </div>
             

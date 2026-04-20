@@ -235,7 +235,8 @@ El sistema implementa autenticación con control de acceso basado en roles (RBAC
 
 ![Login](\AdventureWorksDominicana.Blazor\wwwroot\Capturas\login AWD.png) 
 ![Home](\AdventureWorksDominicana.Blazor\wwwroot\Capturas\login AWD.png) 
-![Nomina](\AdventureWorksDominicana.Blazor\wwwroot\Capturas\PayRoll AWD.png)
+![Sales](\AdventureWorksDominicana.Blazor\wwwroot\Capturas\Sales AWD.png)
+![PayRoll](\AdventureWorksDominicana.Blazor\wwwroot\Capturas\PayRoll AWD.png)
 
 
 ---

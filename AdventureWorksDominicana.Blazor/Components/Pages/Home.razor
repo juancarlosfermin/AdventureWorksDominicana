@@ -28,7 +28,7 @@
     <div class="hero-banner">
         <div class="hero-content">
             <h1>Pedalea hacia la aventura</h1>
-            <p>Descubre nuestra coleccion de bicicletas de montana, ruta y urbana con hasta <strong>30% de descuento</strong></p>
+            <p>Descubre nuestra colección de bicicletas de montaña, ruta y urbana con hasta <strong>30% de descuento</strong></p>
             <div class="hero-buttons">
                 <a href="/Sales" class="btn-hero-primary">Comprar ahora -></a>
                 <a href="/Sales" class="btn-hero-secondary">Ver ofertas</a>
@@ -51,11 +51,11 @@
     </div>
 
     <section class="categories-section">
-        <h2>Categorias destacadas</h2>
+        <h2>Categorías destacadas</h2>
         <div class="categories-grid">
             <a href="/Sales?category=Mountain" class="category-card">
                 <i class="bi bi-tree"></i>
-                <span>Montana</span>
+                <span>Montaña</span>
             </a>
             <a href="/Sales?category=Road" class="category-card">
                 <i class="bi bi-signpost-2"></i>
@@ -67,7 +67,7 @@
             </a>
             <a href="/Sales?category=Standard" class="category-card">
                 <i class="bi bi-bicycle"></i>
-                <span>Estandar</span>
+                <span>Estándar</span>
             </a>
             <a href="/Sales?category=Accessories" class="category-card">
                 <i class="bi bi-gear"></i>
@@ -122,13 +122,13 @@
     <section class="offers-section">
         <div class="offer-card">
             <div class="offer-icon"><i class="bi bi-truck"></i></div>
-            <h3>Envio gratis</h3>
+            <h3>Envío gratis</h3>
             <p>En compras superiores a <strong>RD$5,000</strong></p>
         </div>
         <div class="offer-card">
             <div class="offer-icon"><i class="bi bi-shield-check"></i></div>
-            <h3>Garantia extendida</h3>
-            <p>2 anos en todos nuestros productos</p>
+            <h3>Garantía extendida</h3>
+            <p>2 años en todos nuestros productos</p>
         </div>
         <div class="offer-card">
             <div class="offer-icon"><i class="bi bi-credit-card"></i></div>
@@ -138,13 +138,13 @@
         <div class="offer-card">
             <div class="offer-icon"><i class="bi bi-headset"></i></div>
             <h3>Soporte 24/7</h3>
-            <p>Atencion al cliente siempre disponible</p>
+            <p>Atención al cliente siempre disponible</p>
         </div>
     </section>
 
     <div class="promo-banner">
         <div class="promo-content">
-            <h3>Oferta especial de temporada!</h3>
+            <h3>¡Oferta especial de temporada!</h3>
             <p>Lleva tu bicicleta favorita con <strong>hasta 40% de descuento</strong> y recibe accesorios gratis</p>
             <a href="/Sales" class="btn-promo">Aprovechar oferta -></a>
         </div>
@@ -155,28 +155,28 @@
         <div class="testimonials-grid">
             <div class="testimonial-card">
                 <div class="rating">★★★★★</div>
-                <p>"Excelente calidad, la bicicleta llego en perfectas condiciones y antes de lo esperado. Muy recomendados."</p>
-                <div class="customer"><strong>Juan Perez</strong><span>Comprador verificado</span></div>
+                <p>"Excelente calidad, la bicicleta llegó en perfectas condiciones y antes de lo esperado. Muy recomendados."</p>
+                <div class="customer"><strong>Juan Pérez</strong><span>Comprador verificado</span></div>
             </div>
             <div class="testimonial-card">
                 <div class="rating">★★★★★</div>
-                <p>"El servicio al cliente es increible. Me ayudaron a elegir la bicicleta perfecta para mis necesidades."</p>
-                <div class="customer"><strong>Maria Gomez</strong><span>Compradora verificada</span></div>
+                <p>"El servicio al cliente es increíble. Me ayudaron a elegir la bicicleta perfecta para mis necesidades."</p>
+                <div class="customer"><strong>María Gómez</strong><span>Compradora verificada</span></div>
             </div>
             <div class="testimonial-card">
                 <div class="rating">★★★★☆</div>
-                <p>"Buenos productos, relacion calidad-precio excelente. Volvere a comprar sin duda."</p>
-                <div class="customer"><strong>Carlos Rodriguez</strong><span>Comprador verificado</span></div>
+                <p>"Buenos productos, relación calidad-precio excelente. Volveré a comprar sin duda."</p>
+                <div class="customer"><strong>Carlos Rodríguez</strong><span>Comprador verificado</span></div>
             </div>
         </div>
     </section>
 
     <div class="newsletter-section">
         <div class="newsletter-content">
-            <h3>Suscribete a nuestro newsletter</h3>
+            <h3>Suscríbete a nuestro newsletter</h3>
             <p>Recibe ofertas exclusivas y novedades directamente en tu correo</p>
             <div class="newsletter-form">
-                <input type="email" class="form-control" placeholder="Tu correo electronico" @bind="newsletterEmail" />
+                <input type="email" class="form-control" placeholder="Tu correo electrónico" @bind="newsletterEmail" />
                 <button class="btn-newsletter" @onclick="SubscribeNewsletter">Suscribirme</button>
             </div>
         </div>
@@ -224,7 +224,7 @@
     {
         if (string.IsNullOrEmpty(UserEmail))
         {
-            toastService.ShowWarning("Debes iniciar sesion para agregar productos");
+            toastService.ShowWarning("Debes iniciar sesión para agregar productos");
             navigationManager.NavigateTo("/Account/Login");
             return;
         }
@@ -243,11 +243,11 @@
             await shoppingCartItemService.Guardar(cartItem);
 
             await UpdateCartCount();
-            toastService.ShowSuccess("Producto anadido al carrito");
+            toastService.ShowSuccess("Producto añadido al carrito");
         }
         catch (Exception ex)
         {
-            toastService.ShowError("Error al anadir producto");
+            toastService.ShowError("Error al añadir producto");
             Console.WriteLine(ex.Message);
         }
     }
@@ -256,10 +256,10 @@
     {
         if (string.IsNullOrEmpty(newsletterEmail))
         {
-            toastService.ShowWarning("Ingresa un correo valido");
+            toastService.ShowWarning("Ingresa un correo válido");
             return;
         }
-        toastService.ShowSuccess("Suscripcion exitosa!");
+        toastService.ShowSuccess("¡Suscripción exitosa!");
         newsletterEmail = string.Empty;
     }
 

@@ -118,7 +118,7 @@
 
         canEdit = user.IsInRole("Admin") || user.IsInRole("ProductionManager");
 
-        ListaProducts = await productService.GetList(p => p.ProductId > 0);
+        ListaProducts = await productService.GetListIndex(p => p.ProductId > 0);
         ListaProducts = ListaProducts.OrderByDescending(p => p.ModifiedDate).ToList();
     }
 
@@ -157,7 +157,7 @@
             }
         }
 
-        ListaProducts = await productService.GetList(criterio);
+        ListaProducts = await productService.GetListIndex(criterio);
         ListaProducts = ListaProducts.OrderByDescending(s => s.ModifiedDate).ToList();
     }
 

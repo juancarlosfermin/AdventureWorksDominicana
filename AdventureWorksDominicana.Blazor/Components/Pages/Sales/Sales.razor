@@ -39,7 +39,7 @@
 			</div>
 			<div class="input-group">
 				<select class="form-select" @bind="selectedCategoryId" @bind:after="FiltrarPorCategoria">
-					<option value="0">Todas las categorias</option>
+					<option value="0">Todas las categorías</option>
 					@foreach (var cat in Categorias)
 					{
 						<option value="@cat.ProductCategoryId">@cat.Name</option>
@@ -81,7 +81,7 @@
 						<button type="button" @onclick:stopPropagation
 								@onclick="() => Guardar(p.ProductId)">
 							<i class="bi bi-cart"></i>
-							<span>Anadir al Carrito</span>
+							<span>Añadir al Carrito</span>
 						</button>
 					</div>
 				</div>
@@ -167,7 +167,7 @@
 	{
 		if (string.IsNullOrEmpty(UserEmail))
 		{
-			toastService.ShowWarning("Debe iniciar sesion para agregar productos al carrito");
+			toastService.ShowWarning("Debe iniciar sesión para agregar productos al carrito");
 			return;
 		}
 		try
@@ -180,7 +180,7 @@
 				DateCreated = DateTime.Now,
 				ModifiedDate = DateTime.Now
 			});
-			toastService.ShowSuccess("Producto anadido al carrito");
+			toastService.ShowSuccess("Producto añadido al carrito");
 			await CountProductsShopping();
 		}
 		catch (InvalidOperationException ex)
@@ -189,7 +189,7 @@
 		}
 		catch (Exception ex)
 		{
-			toastService.ShowError("Producto no pudo ser anadido al carrito");
+			toastService.ShowError("Producto no pudo ser añadido al carrito");
 			Console.WriteLine(ex.Message);
 		}
 	}

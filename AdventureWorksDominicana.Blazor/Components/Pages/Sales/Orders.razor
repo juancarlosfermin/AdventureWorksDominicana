@@ -11,7 +11,7 @@
 <div class="orders-container">
     <div class="orders-header">
         <div>
-            <h3>Mis ordenes</h3>
+            <h3>Mis órdenes</h3>
             <span>Historial de compras realizadas</span>
         </div>
         <button class="btn btn-outline bi bi-arrow-left" @onclick="GoToSale"> Seguir comprando</button>
@@ -19,7 +19,7 @@
 
     <div class="orders-summary">
         <div class="summary-card">
-            <span>Total ordenes</span>
+            <span>Total de órdenes</span>
             <h4>@SalesOrderHeadersList.Count</h4>
         </div>
         <div class="summary-card">
@@ -44,7 +44,7 @@
                             </div>
                         </div>
                         <span class="order-status @(s.Status == 1 ? "status-processing" : s.Status == 2 ? "status-processing" : s.Status == 3 ? "status-completed" : "status-cancelled")">
-                            @(s.Status == 1 ? "En proceso" : s.Status == 2 ? "Enviando" : s.Status == 3 ? "Completada" : "Cancelado")
+                            @(s.Status == 1 ? "En proceso" : s.Status == 2 ? "Enviando" : s.Status == 3 ? "Completada" : "Cancelada")
                         </span>
                     </div>
                     <div class="order-total">
@@ -65,7 +65,7 @@
         {
             <div class="text-center p-4 text-muted">
                 <i class="bi bi-box-seam fs-1 mb-2 d-block"></i>
-                <p>No tienes ordenes registradas.</p>
+                <p>No tienes órdenes registradas.</p>
             </div>
         }
     </div>
@@ -123,11 +123,11 @@
         try
         {
             await salesOrderHeaderService.Guardar(sale);
-            toastService.ShowSuccess("Orden Cancelada");
+            toastService.ShowSuccess("Orden cancelada");
         }
         catch (Exception ex)
         {
-            toastService.ShowError("Orden no pudo ser Cancelada");
+            toastService.ShowError("La orden no pudo ser cancelada");
         }
         StateHasChanged();
     }

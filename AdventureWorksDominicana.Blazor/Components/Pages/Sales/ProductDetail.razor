@@ -16,7 +16,7 @@
     <div class="product-header">
         <div>
             <h3>Detalle del producto</h3>
-            <span>Informacion completa del producto</span>
+            <span>Información completa del producto</span>
         </div>
 
         <button class="btn-back" @onclick="GoBack">
@@ -65,7 +65,7 @@
 
                 <p class="product-description">
                     @(Product.ProductModel?.ProductModelProductDescriptionCultures
-                        .FirstOrDefault()?.ProductDescription?.Description ?? "Sin descripcion")
+                        .FirstOrDefault()?.ProductDescription?.Description ?? "Sin descripción")
                 </p>
 
                 <div class="product-price">
